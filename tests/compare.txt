@@ -160,7 +160,7 @@
 <blockquote class="markdown quote"> Blockquote</blockquote>
 
 
-<table class="markdown table"><thead><tr><tr class="markdown row header"><th class="markdown cel left top header"> Column 1 </th><th class="markdown cel top header"> Column 2 </th><th class="markdown cel right top header"> Column 3 </th></tr><tr class="markdown row header"></tr></tr></thead><tbody><tr class="markdown row"><td class="markdown cel left bottom"> Cell 1   </td><td class="markdown cel bottom"> Cell 2   </td><td class="markdown cel right bottom"> Cell 3   </td></tr></tbody></table>
+<table class="markdown table"><thead><tr class="markdown row header"><th class="markdown cel left top header"> Column 1 </th><th class="markdown cel top header"> Column 2 </th><th class="markdown cel right top header"> Column 3 </th></tr></thead><tbody><tr class="markdown row"><td class="markdown cel left bottom"> Cell 1   </td><td class="markdown cel bottom"> Cell 2   </td><td class="markdown cel right bottom"> Cell 3   </td></tr></tbody></table>
 
 
 ----
