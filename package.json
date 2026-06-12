@@ -1,6 +1,6 @@
 {
   "name": "marceo",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Converts Markdown to HTML, allowing you to create fully customized and structured HTML documents.",
   "exports": {
     "import": "./dist/index.mjs",
@@ -10,6 +10,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "testbuild": "node tests/runTest.mjs",
+    "regression": "node tests/regression.mjs",
+    "test": "node tests/runTest.mjs && node tests/regression.mjs",
     "build": "rollup -c"
   },
   "repository": {
