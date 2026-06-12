@@ -1,0 +1,54 @@
+name: Publish Package
+
+on:
+  workflow_run:
+    workflows: ["Version Updater"]
+    types: [completed]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: ${{ !github.event.workflow_run || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Skip if version already published
+        id: gate
+        run: |
+          LOCAL=$(jq -r .version package.json)
+          PUBLISHED=$(npm view marceo version 2>/dev/null || echo "none")
+          echo "local=$LOCAL published=$PUBLISHED"
+          if [ "$LOCAL" != "$PUBLISHED" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "version $LOCAL already on npm — skipping"
+          fi
+
+      - name: Install dependencies
+        if: steps.gate.outputs.publish == 'true'
+        run: npm ci
+
+      - name: Test
+        if: steps.gate.outputs.publish == 'true'
+        run: npm test
+
+      - name: Publish
+        if: steps.gate.outputs.publish == 'true'
+        run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}

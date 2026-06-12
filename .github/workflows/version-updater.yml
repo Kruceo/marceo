@@ -1,0 +1,38 @@
+name: Version Updater
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Configure git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Run pipoca
+        run: npx -y pipoca update package.json
+
+      - name: Sync package-lock version
+        run: npm install --package-lock-only
+
+      - name: Push version change
+        run: |
+          git add package.json package-lock.json
+          git diff --cached --quiet || git commit -m "[Automated] Update version"
+          git push origin HEAD
