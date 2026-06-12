@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ["Version Updater"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Get version
+        id: version
+        run: |
+          V="v$(jq -r .version package.json)"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if [ -n "$(git ls-remote --tags origin "refs/tags/$V")" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "tag $V already exists — skipping release"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.version.outputs.exists == 'false'
+        run: npm ci
+
+      # npm test runs the snapshot build (which produces dist/) plus the
+      # regression suite — the release artifacts come out of this step.
+      - name: Test
+        if: steps.version.outputs.exists == 'false'
+        run: npm test
+
+      - name: Create Release
+        if: steps.version.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: |
+            dist/index.js
+            dist/index.mjs
+            dist/index.d.ts

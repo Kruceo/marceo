@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kruceo/marceo.git"
+    "url": "git+https://github.com/Kruceo/Marceo.git"
   },
   "keywords": [
     "markdown",
@@ -26,9 +26,9 @@
   "author": "kruceo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Kruceo/marceo/issues"
+    "url": "https://github.com/Kruceo/Marceo/issues"
   },
-  "homepage": "https://github.com/Kruceo/marceo#readme",
+  "homepage": "https://github.com/Kruceo/Marceo#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",

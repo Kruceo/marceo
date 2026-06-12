@@ -1,0 +1,48 @@
+name: Version Updater
+
+# Same chain as Kruceo/Pipoca (Version Updater -> Release -> Publish), but the
+# bump level is calculated by the inline script below instead of pipoca.
+# Baseline is the last commit that changed "version" in package.json, so a
+# manual bump merged via PR is respected and never double-bumped.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate bump from commit history
+        id: bump
+        run: |
+          BASE=$(git log -n1 --format=%H -G'"version": ' -- package.json)
+          RANGE=${BASE:+$BASE..HEAD}
+          echo "baseline: ${BASE:-repository root}"
+          git log --format='  %s' $RANGE
+          subjects() { git log --format=%s $RANGE; }
+          if subjects | grep -qiE '^(breaking|release|new)(\(.+\))?:'; then LEVEL=major
+          elif subjects | grep -qiE '^(feat|feature|att|update)(\(.+\))?:'; then LEVEL=minor
+          elif subjects | grep -qiE '^(fix|style|refactor|improvement|docs)(\(.+\))?:'; then LEVEL=patch
+          else LEVEL=none; fi
+          echo "level=$LEVEL" >> "$GITHUB_OUTPUT"
+          echo "bump level: $LEVEL"
+
+      - name: Bump version
+        if: steps.bump.outputs.level != 'none'
+        run: npm version ${{ steps.bump.outputs.level }} --no-git-tag-version
+
+      - name: Push
+        if: steps.bump.outputs.level != 'none'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json
+          git commit -m "[Automated] Update version"
+          git push origin HEAD
