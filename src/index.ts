@@ -7,7 +7,7 @@ import { header5, header4, header3, header2, header1 } from "./plugins/header"
 import { image } from "./plugins/image"
 import { inlineCode } from "./plugins/inlineCode"
 import { italic, unItalic } from "./plugins/italic"
-import { line } from "./plugins/line"
+import { line, hyphenLine } from "./plugins/line"
 import { quote } from "./plugins/quote"
 import { scratched } from "./plugins/scratched"
 import { task } from "./plugins/task"
@@ -28,6 +28,7 @@ const defaultPlugins:Plugin[] = [
     bold,
     italic,
     line,
+    hyphenLine,
     unItalic,
     markdownTable,
     image,
